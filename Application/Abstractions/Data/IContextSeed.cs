@@ -1,0 +1,13 @@
+﻿using Domain.ExternalEntities.Dtos;
+using Microsoft.AspNetCore.Identity;
+using SharedKernel;
+
+namespace Application.Abstractions.Data
+{
+    public interface IContextSeed
+    {
+      
+        //Task SeedRolesAsync(RoleManager<IdentityRole> roleManager);
+        string GetDefaultPassword();
+    }
+}
