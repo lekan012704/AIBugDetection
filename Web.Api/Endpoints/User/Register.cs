@@ -34,6 +34,7 @@ internal sealed class Register : IEndpoint
         })
         .RequireAuthorization()
         .WithName("RegisterUser")
+        .AllowAnonymous()
         .WithTags(Tags.Users)
         .Produces(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)

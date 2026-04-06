@@ -1,33 +1,34 @@
 ﻿using Application.Abstractions.ExceptionHandlers;
-using Application.Handlers.Commands.BugDetection.RunDeepAnalysis;
+using Application.Handlers.Queries.BugDetection.GetSessionIssues;
 using Asp.Versioning.Conventions;
 using Domain.Application.Dtos.BugDetection;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.BugDetection;
 
-internal sealed class RunDeepAnalysisEndpoint : IEndpoint
+internal sealed class GetSessionIssuesEndpoint : IEndpoint
 {
-    public sealed record Request(
-        Guid SessionId,
-        List<UserAnswerDto> Answers);
-
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/v{version:apiVersion}/analysis/deep",
+        app.MapGet(
+            "api/v{version:apiVersion}/analysis/{sessionId:guid}/issues",
             async (
-                Request request,
+                Guid sessionId,
                 ISender sender,
-                CancellationToken cancellationToken) =>
+                CancellationToken cancellationToken,
+                string? severity = null,
+                string? issueType = null,
+                string? phase = null) =>
             {
-                var command = new RunDeepAnalysisCommand(
-                    request.SessionId,
-                    request.Answers);
+                var query = new GetSessionIssuesQuery(
+                    sessionId,
+                    severity,
+                    issueType,
+                    phase);
 
                 var result = await sender
-                    .Send(command, cancellationToken)
+                    .Send(query, cancellationToken)
                     .ConfigureAwait(false);
 
                 return result.MatchWithValue(
@@ -35,10 +36,9 @@ internal sealed class RunDeepAnalysisEndpoint : IEndpoint
                     onError: _ => CustomResults.Problem(result));
             })
         .WithTags(Tags.BugDetection)
-        .WithName("RunDeepAnalysis")
+        .WithName("GetSessionIssues")
         .RequireAuthorization()
-        .Produces<DeepAnalysisResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .Produces<List<CodeIssueResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError)

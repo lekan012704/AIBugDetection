@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Abstractions\ExternalServices\" />
-    <Folder Include="Handlers\Queries\BugDetection\GetSession\" />
   </ItemGroup>
 	
  <ItemGroup>

@@ -41,7 +41,7 @@ internal sealed class SubmitCodeEndpoint : IEndpoint
                     onSuccess: data => Results.Ok(data),
                     onError: _ => CustomResults.Problem(result));
             })
-        .WithTags("BugDetection")
+        .WithTags(Tags.BugDetection)
         .WithName("SubmitCode")
         .RequireAuthorization()
         .DisableAntiforgery()

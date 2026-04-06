@@ -1,33 +1,31 @@
 ﻿using Application.Abstractions.ExceptionHandlers;
-using Application.Handlers.Commands.BugDetection.RunDeepAnalysis;
+using Application.Handlers.Queries.BugDetection.GetMySessions;
 using Asp.Versioning.Conventions;
+using Domain.Application.Dtos;
 using Domain.Application.Dtos.BugDetection;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Web.Api.Extensions;
 
 namespace Web.Api.Endpoints.BugDetection;
 
-internal sealed class RunDeepAnalysisEndpoint : IEndpoint
+internal sealed class GetMySessionsEndpoint : IEndpoint
 {
-    public sealed record Request(
-        Guid SessionId,
-        List<UserAnswerDto> Answers);
-
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("api/v{version:apiVersion}/analysis/deep",
+        app.MapGet(
+            "api/v{version:apiVersion}/analysis/my-sessions",
             async (
-                Request request,
                 ISender sender,
-                CancellationToken cancellationToken) =>
+                CancellationToken cancellationToken,
+                int pageNumber = 1,
+                int pageSize = 10) =>
             {
-                var command = new RunDeepAnalysisCommand(
-                    request.SessionId,
-                    request.Answers);
+                var query = new GetMySessionsQuery(
+                    pageNumber,
+                    pageSize);
 
                 var result = await sender
-                    .Send(command, cancellationToken)
+                    .Send(query, cancellationToken)
                     .ConfigureAwait(false);
 
                 return result.MatchWithValue(
@@ -35,12 +33,11 @@ internal sealed class RunDeepAnalysisEndpoint : IEndpoint
                     onError: _ => CustomResults.Problem(result));
             })
         .WithTags(Tags.BugDetection)
-        .WithName("RunDeepAnalysis")
+        .WithName("GetMySessions")
         .RequireAuthorization()
-        .Produces<DeepAnalysisResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .Produces<PagedResult<SessionSummaryResponse>>(
+            StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
-        .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithApiVersionSet(app.NewApiVersionSet()
             .HasApiVersion(ApiVersions.V1)
