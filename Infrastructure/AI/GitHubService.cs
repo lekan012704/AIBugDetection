@@ -58,7 +58,7 @@ public sealed class GitHubService : IGitHubService
             var headers = new Dictionary<string, string>
             {
                 ["User-Agent"] = "AIBugDetection/1.0",
-                ["Authorization"] = $"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",
+                //["Authorization"] = $"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",
                 ["Accept"] = "text/plain"
             };
            
