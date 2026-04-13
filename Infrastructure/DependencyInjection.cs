@@ -125,10 +125,6 @@ public static class DependencyInjection
             });
         });
 
-        // ✅ Removed — ASP.NET Identity not needed, Keycloak manages users
-        // services.AddIdentity<User, IdentityRole>()
-        //     .AddEntityFrameworkStores<ApplicationDbContext>()
-        //     .AddDefaultTokenProviders();
 
         services.AddScoped<IUnitOfWork>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());

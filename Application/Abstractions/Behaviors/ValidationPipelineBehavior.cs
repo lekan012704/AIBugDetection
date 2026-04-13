@@ -20,8 +20,8 @@ internal sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelin
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
-    {
-        if (!_validators.Any())
+    {   
+        if (!_validators.Any()) 
         {
             return await next();
         }

@@ -29,7 +29,7 @@ namespace SharedKernel.Helpers.GenericHttpClientService
             {
                 _logger.LogInformation("Sending GET request to {Uri}", uri);
 
-                HttpClient httpClient = CreateHttpClient(uri, authToken, headers);
+                HttpClient  httpClient = CreateHttpClient(uri, authToken, headers);
 
                 var responseMessage = await ExecuteWithRetryAsync(() => httpClient.GetAsync(uri));
 
@@ -140,20 +140,18 @@ namespace SharedKernel.Helpers.GenericHttpClientService
         /// <param name="headers">Additional headers to include in the request.</param>
         /// <param name="clientName">The name of the client to create from the factory.</param>
         /// <returns>An instance of HttpClient configured with the provided headers and authorization token.</returns>
-        private HttpClient CreateHttpClient(string clientName, string authToken = "", Dictionary<string, string>? headers = null)
+        private HttpClient CreateHttpClient(string clientName, string authToken =  "", Dictionary<string, string>? headers = null)
         {
             var httpClient = _factory.CreateClient(clientName);
 
-            // Set default accept header
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Accept.Clear();
 
-            // Add authorization if token provided
             if (!string.IsNullOrEmpty(authToken))
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", authToken);
             }
 
-            // Add custom headers if provided
             if (headers != null)
             {
                 foreach (var (key, value) in headers)
@@ -235,7 +233,7 @@ namespace SharedKernel.Helpers.GenericHttpClientService
         private async Task<TResult> ExecuteWithRetryAsync<TResult>(Func<Task<TResult>> action)
         {
             return await Policy
-                .Handle<HttpRequestException>()
+                .Handle<HttpRequestException>() 
                 .Or<TaskCanceledException>()
                 .Or<WebException>()
                 .WaitAndRetryAsync(
