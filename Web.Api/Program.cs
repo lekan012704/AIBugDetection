@@ -90,7 +90,7 @@ try
         {
             corsBuilder
                 .AllowAnyOrigin()
-                .AllowAnyMethod()
+                .AllowAnyMethod()   
                 .AllowAnyHeader();
         });
 

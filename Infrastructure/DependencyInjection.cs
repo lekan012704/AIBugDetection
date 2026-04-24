@@ -383,11 +383,12 @@ public static class DependencyInjection
         var database = uri.AbsolutePath.TrimStart('/');
 
         return $"Host={uri.Host};" +
-               $"Port={uri.Port};" +
-               $"Database={database};" +
-               $"Username={userInfo[0]};" +
-               $"Password={Uri.UnescapeDataString(userInfo[1])};" +
-               $"SSL Mode=true;"; // ✅ FIXED
+                 $"Port={uri.Port};" +
+                 $"Database={database};" +
+                 $"Username={userInfo[0]};" +
+                 $"Password={Uri.UnescapeDataString(userInfo[1])};" +
+                 $"SSL Mode=Require;" +
+                 $"Trust Server Certificate=true;";
     }
 
     private static IServiceCollection AddHealthChecks(
