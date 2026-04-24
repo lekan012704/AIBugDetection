@@ -133,14 +133,16 @@ public static class DependencyInjection
             throw new Exception("DATABASE_URL is not set");
         }
 
-        var connectionStrings = ConvertToNpgsqlConnectionString(databaseUrl);
-
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.EnableRetryOnFailure(3);
                 npgsqlOptions.CommandTimeout(30);
+            })
+            .ConfigureWarnings(warnings =>
+            {
+                warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning);
             });
         });
         services.AddScoped<IUnitOfWork>(sp =>
