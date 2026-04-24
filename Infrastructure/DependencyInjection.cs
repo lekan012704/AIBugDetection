@@ -126,6 +126,15 @@ public static class DependencyInjection
                 connectionString);
         }
 
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+        if (string.IsNullOrWhiteSpace(databaseUrl))
+        {
+            throw new Exception("DATABASE_URL is not set");
+        }
+
+        var connectionStrings = ConvertToNpgsqlConnectionString(databaseUrl);
+
         services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(connectionString, npgsqlOptions =>
