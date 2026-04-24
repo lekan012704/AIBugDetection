@@ -79,7 +79,6 @@ try
     {
         Log.Fatal(ex, "Migration failed");
     }
-    await app.RunAsync();
 
     // ✅ Configure HTTP pipeline in correct order
 
