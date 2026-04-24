@@ -66,7 +66,9 @@ public sealed class ApplicationDbContext(
             entity.HasIndex(u => u.KeycloakId).IsUnique();
             entity.HasIndex(u => u.Email).IsUnique();
 
-            entity.Property(u => u.RowVersion).IsRowVersion();
+            entity.Property(u => u.RowVersion)
+    .IsConcurrencyToken()
+    .HasDefaultValueSql("gen_random_uuid()");
         });
     }
 
