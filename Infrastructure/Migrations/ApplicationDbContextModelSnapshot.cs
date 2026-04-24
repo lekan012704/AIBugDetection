@@ -53,9 +53,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("NewValues")
                         .IsRequired()
                         .HasMaxLength(2147483647)
@@ -554,9 +551,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastProcessedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("RetryCount")
                         .HasColumnType("int");
 
@@ -651,9 +645,6 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
-
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PermissionId")
                         .IsRequired()

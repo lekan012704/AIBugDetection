@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260402161537_AddBugDetection_Tables")]
-    partial class AddBugDetection_Tables
+    [Migration("20260424133138_InitialPostgresCreate")]
+    partial class InitialPostgresCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,9 +55,6 @@ namespace Infrastructure.Migrations
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NewValues")
                         .IsRequired()
@@ -557,9 +554,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime?>("LastProcessedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("RetryCount")
                         .HasColumnType("int");
 
@@ -654,9 +648,6 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
-
-                    b.Property<string>("MerchantCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PermissionId")
                         .IsRequired()
