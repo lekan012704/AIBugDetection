@@ -163,6 +163,11 @@ try
     {
         options.UIPath = "/health-ui";
     });
+    app.MapPost("/admin/migrate-db", async (ApplicationDbContext dbContext) =>
+    {
+        await dbContext.Database.MigrateAsync();
+        return Results.Ok("Database migrated successfully");
+    });
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
     await app.RunAsync();
