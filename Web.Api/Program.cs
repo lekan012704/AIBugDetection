@@ -70,14 +70,20 @@ try
     try
     {
         using var scope = app.Services.CreateScope();
+
         var dbContext = scope.ServiceProvider
             .GetRequiredService<ApplicationDbContext>();
 
+        Log.Information("Applying database migrations...");
+
         dbContext.Database.Migrate();
+
+        Log.Information("Database migrations applied successfully.");
     }
     catch (Exception ex)
     {
-        Log.Fatal(ex, "Migration failed");
+        Log.Fatal(ex, "Database migration failed");
+        throw; // 🔥 VERY IMPORTANT: DO NOT HIDE ERROR
     }
 
     // ✅ Configure HTTP pipeline in correct order
@@ -167,7 +173,6 @@ try
     });
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
-    await app.RunAsync();
     Log.Information("BUG DETECTION Api Starting..");
     await app.RunAsync();
     Log.Information("BUG DETECTION Api Started..");
