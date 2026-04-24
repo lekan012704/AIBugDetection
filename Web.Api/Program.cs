@@ -167,7 +167,7 @@ try
     });
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
-
+    await app.RunAsync();
     Log.Information("BUG DETECTION Api Starting..");
     await app.RunAsync();
     Log.Information("BUG DETECTION Api Started..");
