@@ -165,8 +165,22 @@ try
     });
     app.MapPost("/admin/migrate-db", async (ApplicationDbContext dbContext) =>
     {
-        await dbContext.Database.MigrateAsync();
-        return Results.Ok("Database migrated successfully");
+        try
+        {
+            await dbContext.Database.MigrateAsync();
+
+            return Results.Ok(new
+            {
+                message = "Database migrated successfully"
+            });
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(
+                title: "Migration failed",
+                detail: ex.ToString(),
+                statusCode: 500);
+        }
     });
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
