@@ -2,8 +2,10 @@
 using Asp.Versioning.ApiExplorer;
 using HealthChecks.UI.Client;
 using Infrastructure;
+using Infrastructure.Database;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Serilog;
 using SharedKernel;
@@ -19,7 +21,7 @@ try
         .CreateBootstrapLogger();
 
     Log.Information("BUG DETECTION Api Starting..");
-
+        
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -47,7 +49,13 @@ try
         //.AddSharedKernel();
 
     builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
-    
+    builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile(
+        $"appsettings.{builder.Environment.EnvironmentName}.json",
+        optional: true)
+    .AddEnvironmentVariables();
+
     builder.Services.AddHealthChecksUI(options =>
     {
         options.AddHealthCheckEndpoint("main", "/health");
@@ -57,8 +65,21 @@ try
 
     // Load env vars early
     DotNetEnv.Env.Load();
-
     var app = builder.Build();
+
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider
+            .GetRequiredService<ApplicationDbContext>();
+
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "Migration failed");
+    }
+    await app.RunAsync();
 
     // ✅ Configure HTTP pipeline in correct order
 

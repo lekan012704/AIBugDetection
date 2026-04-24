@@ -61,8 +61,8 @@ public static class DependencyInjection
             .AddCaching(configuration)
             .AddApiVersioning()
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal()
-            .AddEmailingService(configuration);
+            .AddAuthorizationInternal();
+        //    .AddEmailingService(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
@@ -88,6 +88,7 @@ public static class DependencyInjection
         services.AddScoped<IBugItemRepository, BugItemRepository>();
         services.AddScoped<IBugReportRepository, BugReportRepository>();
         services.AddScoped<ICodeAnalysisSessionRepository, CodeAnalysisSessionRepository>();
+        
 
         // ✅ Removed — Keycloak issues tokens, we don't create our own
         // services.AddSingleton<IPasswordHasher, PasswordHasher>();
@@ -106,69 +107,309 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddDatabase(
-        this IServiceCollection services,
-        IConfiguration configuration)
+     this IServiceCollection services,
+     IConfiguration configuration)
     {
-        string? connectionString =
+        // ✅ Read from environment variable first
+        // Fly.io sets DATABASE_URL automatically
+        var connectionString =
+            Environment.GetEnvironmentVariable("DATABASE_URL") ??
             configuration.GetConnectionString("Database") ??
             throw new ArgumentNullException(
-                $"Database connection string is not configured for {nameof(AddDatabase)}");
+                "Database connection string not configured");
+
+        // ✅ Convert Fly.io postgres:// URL to Npgsql format
+        if (connectionString.StartsWith("postgres://") ||
+            connectionString.StartsWith("postgresql://"))
+        {
+            connectionString = ConvertToNpgsqlConnectionString(
+                connectionString);
+        }
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseSqlServer(connectionString, sqlOptions =>
+            options.UseNpgsql(connectionString, npgsqlOptions =>
             {
-                sqlOptions.MigrationsHistoryTable(
-                    HistoryRepository.DefaultTableName, Schemas.Default);
-                sqlOptions.EnableRetryOnFailure(3);
-                sqlOptions.CommandTimeout(30);
+                npgsqlOptions.EnableRetryOnFailure(3);
+                npgsqlOptions.CommandTimeout(30);
             });
         });
-
-
         services.AddScoped<IUnitOfWork>(sp =>
-            sp.GetRequiredService<ApplicationDbContext>());
+         sp.GetRequiredService<ApplicationDbContext>());
 
-        //services.AddScoped<IDapperFactory>(sp =>
-        //{
-        //    var handleException = sp.GetRequiredService<IHandleException>();
-        //    return new DapperFactory(configuration, handleException);
-        //});
+        services.Configure<AppSettings>(options =>
+        {
+            options.ApplicationBaseUrl =
+                Environment.GetEnvironmentVariable("APP_BASE_URL") ??
+                configuration["AppSettings:ApplicationBaseUrl"] ?? "";
 
-        services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
-        services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
-        services.Configure<SendGridOptions>(configuration.GetSection("SendGridOptions"));
+            options.UseMockAiResponse =
+                bool.Parse(
+                    Environment.GetEnvironmentVariable("USE_MOCK_AI") ??
+                    configuration["AppSettings:UseMockAiResponse"] ??
+                    "true");
 
-        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+            // ── Gemini ──────────────────────────────────
+            options.GeminiApiKey =
+                Environment.GetEnvironmentVariable("GEMINI_API_KEY") ??
+                configuration["AppSettings:GeminiApiKey"] ?? "";    
+
+            options.GeminiApiUrl =
+                Environment.GetEnvironmentVariable("GEMINI_API_URL") ??
+                configuration["AppSettings:GeminiApiUrl"] ?? "";
+
+            options.GeminiModel =
+                Environment.GetEnvironmentVariable("GEMINI_MODEL") ??
+                configuration["AppSettings:GeminiModel"] ?? "";
+
+            // ── Claude ──────────────────────────────────
+            options.ClaudeOpenApiKey =
+                Environment.GetEnvironmentVariable("CLAUDE_API_KEY") ??
+                configuration["AppSettings:ClaudeOpenApiKey"] ?? "";
+
+            options.ClaudeOpenApiUrl =
+                Environment.GetEnvironmentVariable("CLAUDE_API_URL") ??
+                configuration["AppSettings:ClaudeOpenApiUrl"] ?? "";
+
+            options.ClaudeModel =
+                Environment.GetEnvironmentVariable("CLAUDE_MODEL") ??
+                configuration["AppSettings:ClaudeModel"] ?? "";
+
+            options.AnthropicVersion =
+                Environment.GetEnvironmentVariable("ANTHROPIC_VERSION") ??
+                configuration["AppSettings:AnthropicVersion"] ?? "";
+
+            // ── OpenAI ──────────────────────────────────
+            options.OpenAiApiKey =
+                Environment.GetEnvironmentVariable("OPENAI_API_KEY") ??
+                configuration["AppSettings:OpenAiApiKey"] ?? "";
+
+            options.OpenAiApiUrl =
+                Environment.GetEnvironmentVariable("OPENAI_API_URL") ??
+                configuration["AppSettings:OpenAiApiUrl"] ?? "";
+
+            options.OpenAiModel =
+                Environment.GetEnvironmentVariable("OPENAI_MODEL") ??
+                configuration["AppSettings:OpenAiModel"] ?? "";
+        });
+
+        // ── Keycloak ────────────────────────────────────
+        services.Configure<KeycloakOptions>(options =>
+        {
+            options.BaseUrl =
+                Environment.GetEnvironmentVariable("KEYCLOAK_BASEURL") ??
+                configuration["KeyCloak:BaseUrl"] ?? "";
+
+            options.Authority =
+                Environment.GetEnvironmentVariable("KEYCLOAK_AUTHORITY") ??
+                configuration["KeyCloak:Authority"] ?? "";
+
+            options.ClientId =
+                Environment.GetEnvironmentVariable("KEYCLOAK_CLIENTID") ??
+                configuration["KeyCloak:ClientId"] ?? "";
+
+            options.TokenUrl =
+                Environment.GetEnvironmentVariable("KEYCLOAK_TOKENURL") ??
+                configuration["KeyCloak:TokenUrl"] ?? "";
+
+            options.AdminUrl =
+                Environment.GetEnvironmentVariable("KEYCLOAK_ADMINURL") ??
+                configuration["KeyCloak:AdminUrl"] ?? "";
+
+            options.AuthClientId =
+                Environment.GetEnvironmentVariable("KEYCLOAK_AUTHCLIENTID") ??
+                configuration["KeyCloak:AuthClientId"] ?? "";
+
+            options.AuthClientSecret =
+                Environment.GetEnvironmentVariable("KEYCLOAK_AUTHCLIENTSECRET") ??
+                configuration["KeyCloak:AuthClientSecret"] ?? "";
+
+            options.AdminClientId =
+                Environment.GetEnvironmentVariable("KEYCLOAK_ADMINCLIENTID") ??
+                configuration["KeyCloak:AdminClientId"] ?? "";
+
+            options.AdminClientSecret =
+                Environment.GetEnvironmentVariable("KEYCLOAK_ADMINCLIENTSECRET") ??
+                configuration["KeyCloak:AdminClientSecret"] ?? "";
+        });
+
+        // ── SMTP ────────────────────────────────────────
+        services.Configure<SmtpOptions>(options =>
+        {
+            options.Host =
+                Environment.GetEnvironmentVariable("SMTP_HOST") ??
+                configuration["SmtpOptions:Host"] ?? "";
+
+            options.Port = int.Parse(
+                Environment.GetEnvironmentVariable("SMTP_PORT") ??
+                configuration["SmtpOptions:Port"] ?? "587");
+
+            options.Username =
+                Environment.GetEnvironmentVariable("SMTP_USERNAME") ??
+                configuration["SmtpOptions:Username"] ?? "";
+
+            options.Password =
+                Environment.GetEnvironmentVariable("SMTP_PASSWORD") ??
+                configuration["SmtpOptions:Password"] ?? "";
+
+            options.DisplayName =
+                Environment.GetEnvironmentVariable("SMTP_DISPLAY_NAME") ??
+                configuration["SmtpOptions:DisplayName"] ?? "";
+
+            options.TestEmail =
+                Environment.GetEnvironmentVariable("SMTP_TEST_EMAIL") ??
+                configuration["SmtpOptions:TestEmail"] ?? "";
+
+            options.UseSsl = bool.Parse(
+                Environment.GetEnvironmentVariable("SMTP_USE_SSL") ??
+                configuration["SmtpOptions:UseSsl"] ?? "true");
+
+            options.LicenseKey =
+                Environment.GetEnvironmentVariable("SMTP_LICENSE_KEY") ??
+                configuration["SmtpOptions:LicenseKey"] ?? "";
+        });// In DependencyInjection.cs — AddDatabase method
+           // Map environment variables to AppSettings
+        services.Configure<AppSettings>(options =>
+        {
+            options.ApplicationBaseUrl =
+                Environment.GetEnvironmentVariable("APP_BASE_URL") ??
+                configuration["AppSettings:ApplicationBaseUrl"] ?? "";
+
+            options.UseMockAiResponse =
+                bool.Parse(
+                    Environment.GetEnvironmentVariable("USE_MOCK_AI") ??
+                    configuration["AppSettings:UseMockAiResponse"] ??
+                    "true");
+
+            // ── Gemini ──────────────────────────────────
+            options.GeminiApiKey =
+                Environment.GetEnvironmentVariable("GEMINI_API_KEY") ??
+                configuration["AppSettings:GeminiApiKey"] ?? "";
+
+            options.GeminiApiUrl =
+                Environment.GetEnvironmentVariable("GEMINI_API_URL") ??
+                configuration["AppSettings:GeminiApiUrl"] ?? "";
+
+            options.GeminiModel =
+                Environment.GetEnvironmentVariable("GEMINI_MODEL") ??
+                configuration["AppSettings:GeminiModel"] ?? "";
+
+            // ── Claude ──────────────────────────────────
+            options.ClaudeOpenApiKey =
+                Environment.GetEnvironmentVariable("CLAUDE_API_KEY") ??
+                configuration["AppSettings:ClaudeOpenApiKey"] ?? "";
+
+            options.ClaudeOpenApiUrl =
+                Environment.GetEnvironmentVariable("CLAUDE_API_URL") ??
+                configuration["AppSettings:ClaudeOpenApiUrl"] ?? "";
+
+            options.ClaudeModel =
+                Environment.GetEnvironmentVariable("CLAUDE_MODEL") ??
+                configuration["AppSettings:ClaudeModel"] ?? "";
+
+            options.AnthropicVersion =
+                Environment.GetEnvironmentVariable("ANTHROPIC_VERSION") ??
+                configuration["AppSettings:AnthropicVersion"] ?? "";
+
+            // ── OpenAI ──────────────────────────────────
+            options.OpenAiApiKey =
+                Environment.GetEnvironmentVariable("OPENAI_API_KEY") ??
+                configuration["AppSettings:OpenAiApiKey"] ?? "";
+
+            options.OpenAiApiUrl =
+                Environment.GetEnvironmentVariable("OPENAI_API_URL") ??
+                configuration["AppSettings:OpenAiApiUrl"] ?? "";
+
+            options.OpenAiModel =
+                Environment.GetEnvironmentVariable("OPENAI_MODEL") ??
+                configuration["AppSettings:OpenAiModel"] ?? "";
+        });
+
+        // ── SMTP ────────────────────────────────────────
+        services.Configure<SmtpOptions>(options =>
+        {
+            options.Host =
+                Environment.GetEnvironmentVariable("SMTP_HOST") ??
+                configuration["SmtpOptions:Host"] ?? "";
+
+            options.Port = int.Parse(
+                Environment.GetEnvironmentVariable("SMTP_PORT") ??
+                configuration["SmtpOptions:Port"] ?? "587");
+
+            options.Username =
+                Environment.GetEnvironmentVariable("SMTP_USERNAME") ??
+                configuration["SmtpOptions:Username"] ?? "";
+
+            options.Password =
+                Environment.GetEnvironmentVariable("SMTP_PASSWORD") ??
+                configuration["SmtpOptions:Password"] ?? "";
+
+            options.DisplayName =
+                Environment.GetEnvironmentVariable("SMTP_DISPLAY_NAME") ??
+                configuration["SmtpOptions:DisplayName"] ?? "";
+
+            options.TestEmail =
+                Environment.GetEnvironmentVariable("SMTP_TEST_EMAIL") ??
+                configuration["SmtpOptions:TestEmail"] ?? "";
+
+            options.UseSsl = bool.Parse(
+                Environment.GetEnvironmentVariable("SMTP_USE_SSL") ??
+                configuration["SmtpOptions:UseSsl"] ?? "true");
+
+            options.LicenseKey =
+                Environment.GetEnvironmentVariable("SMTP_LICENSE_KEY") ??
+                configuration["SmtpOptions:LicenseKey"] ?? "";
+        });
 
         return services;
+    }
+
+    private static string ConvertToNpgsqlConnectionString(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentNullException(nameof(url), "DATABASE_URL is empty");
+
+        var uri = new Uri(url);
+        var userInfo = uri.UserInfo.Split(':');
+        var database = uri.AbsolutePath.TrimStart('/');
+
+        return $"Host={uri.Host};" +
+               $"Port={uri.Port};" +
+               $"Database={database};" +
+               $"Username={userInfo[0]};" +
+               $"Password={Uri.UnescapeDataString(userInfo[1])};" +
+               $"SSL Mode=true;"; // ✅ FIXED
     }
 
     private static IServiceCollection AddHealthChecks(
-        this IServiceCollection services,
-        IConfiguration configuration)
-    {
-        services
-            .AddHealthChecks()
-            .AddSqlServer(
-                connectionString: configuration.GetConnectionString("Database")
-                    ?? throw new Exception("Database connection string cannot be null"),
-                healthQuery: "SELECT 1;",
-                name: "AppDatabase",
-                timeout: TimeSpan.FromSeconds(30),
-                failureStatus: HealthStatus.Degraded,
-                tags: ["db", "sql", "sqlserver"])
-            // ✅ Uncomment once Keycloak is running
-            .AddUrlGroup(
-                uri: new Uri(configuration["KeyCloak:BaseUrl"]
-                    ?? throw new Exception("Keycloak BaseUrl is not configured")),
-                httpMethod: HttpMethod.Get,
-                name: "keycloak",
-                failureStatus: HealthStatus.Degraded,
-                tags: ["auth", "keycloak"]);
+    this IServiceCollection services,
+    IConfiguration configuration)
+{
+    var healthChecks = services
+        .AddHealthChecks()
+        .AddSqlServer(
+            connectionString: configuration.GetConnectionString("Database")
+                ?? throw new Exception("Database connection string cannot be null"),
+            healthQuery: "SELECT 1;",
+            name: "AppDatabase",
+            timeout: TimeSpan.FromSeconds(30),
+            failureStatus: HealthStatus.Degraded,
+            tags: ["db", "postgress",]);
 
-        return services;
+    // ✅ Only add Keycloak health check if URL is configured
+    var keycloakUrl = configuration["KeyCloak:BaseUrl"];
+    if (!string.IsNullOrWhiteSpace(keycloakUrl))
+    {
+        healthChecks.AddUrlGroup(
+            uri: new Uri(keycloakUrl),
+            httpMethod: HttpMethod.Get,
+            name: "keycloak",
+            failureStatus: HealthStatus.Degraded,
+            tags: ["auth", "keycloak"]);
     }
+
+    return services;
+}
 
     private static IServiceCollection AddAuthenticationInternal(
      this IServiceCollection services,
@@ -181,7 +422,9 @@ public static class DependencyInjection
         })
         .AddJwtBearer(options =>
         {
-            options.Authority = configuration["KeyCloak:Authority"];
+            options.Authority =
+    Environment.GetEnvironmentVariable("KEYCLOAK_AUTHORITY")
+    ?? configuration["KeyCloak:Authority"];
             options.RequireHttpsMetadata = false; // ⚠️ Set true in production
 
             // ✅ Remove options.Audience = configuration["KeyCloak:ClientId"]
@@ -248,11 +491,16 @@ public static class DependencyInjection
 
         services.Configure<KeycloakOptions>(configuration.GetSection("KeyCloak"));
 
-        services.AddHttpClient<IKeyCloakService,KeyCloakService >(client =>
+        var keycloakBaseUrl =
+        Environment.GetEnvironmentVariable("KEYCLOAK_BASEURL")
+        ?? configuration["KeyCloak:BaseUrl"];
+
+        if (string.IsNullOrWhiteSpace(keycloakBaseUrl))
+            throw new ArgumentNullException("KeyCloak:BaseUrl is not configured");
+
+        services.AddHttpClient<IKeyCloakService, KeyCloakService>(client =>
         {
-            client.BaseAddress = new Uri(
-                configuration["KeyCloak:BaseUrl"]
-                ?? throw new ArgumentNullException("KeyCloak:BaseUrl is not configured"));
+            client.BaseAddress = new Uri(keycloakBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(30);
         });
 

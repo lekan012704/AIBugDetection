@@ -1,0 +1,38 @@
+﻿# ── Stage 1: Build ────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy solution and project files first (for layer caching)
+COPY ["src/Web.Api/Web.Api.csproj", "src/Web.Api/"]
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/Domain/Domain.csproj", "src/Domain/"]
+COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
+COPY ["src/SharedKernel/SharedKernel.csproj", "src/SharedKernel/"]
+
+# Restore dependencies
+RUN dotnet restore "src/Web.Api/Web.Api.csproj"
+
+# Copy everything else
+COPY . .
+
+# Build and publish
+WORKDIR "/src/src/Web.Api"
+RUN dotnet publish "Web.Api.csproj" \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+# ── Stage 2: Runtime ──────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Create logs directory
+RUN mkdir -p Logs
+
+# Copy published output
+COPY --from=build /app/publish .
+
+EXPOSE 8080
+EXPOSE 8081
+
+ENTRYPOINT ["dotnet", "Web.Api.dll"]

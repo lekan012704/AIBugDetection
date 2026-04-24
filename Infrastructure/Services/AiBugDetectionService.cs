@@ -18,21 +18,21 @@ public sealed class AiBugDetectionService(
         CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Running initial analysis with Claude...");
+            "Running initial analysis with OpenAI...");
 
-        var claudeResult = await claudeService
-            .RunInitialAnalysisAsync(code, fileName, cancellationToken);
+        //var claudeResult = await claudeService
+        //    .RunInitialAnalysisAsync(code, fileName, cancellationToken);
 
-        if (!claudeResult.IsError)
-        {
-            logger.LogInformation(
-                "Claude initial analysis successful");
-            return claudeResult;
-        }
-        logger.LogWarning(
-            "Claude failed for initial analysis. " +
-            "Falling back to OpenAI. Error: {Error}",
-            claudeResult.Errors.First().Description);
+        //if (!claudeResult.IsError)
+        //{
+        //    logger.LogInformation(
+        //        "Claude initial analysis successful");
+        //    return claudeResult;
+        //}
+        //logger.LogWarning(
+        //    "Claude failed for initial analysis. " +
+        //    "Falling back to OpenAI. Error: {Error}",
+        //    claudeResult.Errors.First().Description);
 
         var openAiResult = await openAiService
             .RunInitialAnalysisAsync(code, fileName, cancellationToken);
@@ -45,11 +45,11 @@ public sealed class AiBugDetectionService(
             return openAiResult;
         }
 
-        logger.LogError(
-            "Both AI providers failed for initial analysis. " +
-            "Claude: {Claude} OpenAI: {OpenAI}",
-            claudeResult.Errors.First().Description,
-            openAiResult.Errors.First().Description);
+        //logger.LogError(
+        //    "Both AI providers failed for initial analysis. " +
+        //    "Claude: {Claude} OpenAI: {OpenAI}",
+        //    claudeResult.Errors.First().Description,
+        //    openAiResult.Errors.First().Description);
 
         return Errors.Infrastructure.DatabaseError(
             "AI.BothFailed",
@@ -64,22 +64,22 @@ public sealed class AiBugDetectionService(
         CancellationToken cancellationToken)
     {
         logger.LogInformation(
-            "Running deep analysis with Claude...");
+            "Running deep analysis with OpenAi...");
 
-        var claudeResult = await claudeService.RunDeepAnalysisAsync(
-            code, initialObservations, userAnswers,
-            fileName, cancellationToken);
+        //var claudeResult = await claudeService.RunDeepAnalysisAsync(
+        //    code, initialObservations, userAnswers,
+        //    fileName, cancellationToken);
 
-        if (!claudeResult.IsError)
-        {
-            logger.LogInformation(
-                "Claude deep analysis successful");
-            return claudeResult;
-        }
-        logger.LogWarning(
-            "Claude failed for deep analysis. " +
-            "Falling back to OpenAI. Error: {Error}",
-            claudeResult.Errors.First().Description);
+        //if (!claudeResult.IsError)
+        //{
+        //    logger.LogInformation(
+        //        "Claude deep analysis successful");
+        //    return claudeResult;
+        //}
+        //logger.LogWarning(
+        //    "Claude failed for deep analysis. " +
+        //    "Falling back to OpenAI. Error: {Error}",
+        //    claudeResult.Errors.First().Description);
 
         var openAiResult = await openAiService.RunDeepAnalysisAsync(
             code, initialObservations, userAnswers,
@@ -93,11 +93,11 @@ public sealed class AiBugDetectionService(
             return openAiResult;
         }
 
-        logger.LogError(
-            "Both AI providers failed for deep analysis. " +
-            "Claude: {Claude} OpenAI: {OpenAI}",
-            claudeResult.Errors.First().Description,
-            openAiResult.Errors.First().Description);
+        //logger.LogError(
+        //    "Both AI providers failed for deep analysis. " +
+        //    "Claude: {Claude} OpenAI: {OpenAI}",
+        //    claudeResult.Errors.First().Description,
+        //    openAiResult.Errors.First().Description);
 
         return Errors.Infrastructure.DatabaseError(
             "AI.BothFailed",

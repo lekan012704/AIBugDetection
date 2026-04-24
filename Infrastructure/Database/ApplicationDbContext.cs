@@ -149,7 +149,7 @@ public sealed class ApplicationDbContext(
             if (raisedEventAsOutBoxMessage)
                 AddDomainEventsAsOutboxMessages();
 
-            return await CommitTransactionsAsync(cancellationToken);
+            return await CommitTransactionsAsync(cancellationToken);            
         }
         catch (DbUpdateConcurrencyException ex)
         {
