@@ -21,845 +21,844 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "9.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Domain.Application.Entities.Audits.Audit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("ActionByWho")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("ActionByWho")
+                    .HasMaxLength(450)
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<string>("ActionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("ActionType")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("AffectedColumns")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                b.Property<string>("AffectedColumns")
+                    .HasMaxLength(1000)
+                    .HasColumnType("character varying(1000)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("System Admin");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("text")
+                    .HasDefaultValue("System Admin");
 
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("DateTime")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("NewValues")
-                        .IsRequired()
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("NewValues")
+                    .IsRequired()
+                    .HasMaxLength(2147483647)
+                    .HasColumnType("text");
 
-                    b.Property<string>("OldValues")
-                        .IsRequired()
-                        .HasMaxLength(2147483647)
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("OldValues")
+                    .IsRequired()
+                    .HasMaxLength(2147483647)
+                    .HasColumnType("text");
 
-                    b.Property<string>("PrimaryKey")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("PrimaryKey")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<string>("TableName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("TableName")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ActionByWho")
-                        .HasDatabaseName("IX_Audits_ActionByWho");
+                b.HasIndex("ActionByWho")
+                    .HasDatabaseName("IX_Audits_ActionByWho");
 
-                    b.HasIndex("ActionType")
-                        .HasDatabaseName("IX_Audits_ActionType");
+                b.HasIndex("ActionType")
+                    .HasDatabaseName("IX_Audits_ActionType");
 
-                    b.HasIndex("DateTime")
-                        .HasDatabaseName("IX_Audits_DateTime");
+                b.HasIndex("DateTime")
+                    .HasDatabaseName("IX_Audits_DateTime");
 
-                    b.HasIndex("PrimaryKey")
-                        .HasDatabaseName("IX_Audits_PrimaryKey");
+                b.HasIndex("PrimaryKey")
+                    .HasDatabaseName("IX_Audits_PrimaryKey");
 
-                    b.HasIndex("TableName")
-                        .HasDatabaseName("IX_Audits_TableName");
+                b.HasIndex("TableName")
+                    .HasDatabaseName("IX_Audits_TableName");
 
-                    b.HasIndex("ActionByWho", "DateTime")
-                        .HasDatabaseName("IX_Audits_ActionByWho_DateTime");
+                b.HasIndex("ActionByWho", "DateTime")
+                    .HasDatabaseName("IX_Audits_ActionByWho_DateTime");
 
-                    b.HasIndex("TableName", "PrimaryKey", "DateTime")
-                        .HasDatabaseName("IX_Audits_TableName_PrimaryKey_DateTime");
+                b.HasIndex("TableName", "PrimaryKey", "DateTime")
+                    .HasDatabaseName("IX_Audits_TableName_PrimaryKey_DateTime");
 
-                    b.ToTable("AuditLog", "BugDetection");
-                });
+                b.ToTable("AuditLog", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.AnalysisConversation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Message")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                b.Property<int>("OrderIndex")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("Phase")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Phase")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Role")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("SessionId")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("SessionId");
+                b.HasIndex("SessionId");
 
-                    b.ToTable("AnalysisConversations", "BugDetection");
-                });
+                b.ToTable("AnalysisConversations", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.BugItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("BugReportId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("BugReportId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Category")
+                    .HasColumnType("text");
 
-                    b.Property<string>("CodeSnippet")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CodeSnippet")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int?>("EndLineNumber")
-                        .HasColumnType("int");
+                b.Property<int?>("EndLineNumber")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("Explanation")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Explanation")
+                    .HasColumnType("text");
 
-                    b.Property<string>("FixedCode")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FixedCode")
+                    .HasColumnType("text");
 
-                    b.Property<int?>("LineNumber")
-                        .HasColumnType("int");
+                b.Property<int?>("LineNumber")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                b.Property<int>("OrderIndex")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Severity")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("SuggestedFix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SuggestedFix")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("BugReportId");
+                b.HasIndex("BugReportId");
 
-                    b.ToTable("BugItems", "BugDetection");
-                });
+                b.ToTable("BugItems", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.BugReport", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("AiProvider")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("AiProvider")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("AnalyzedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("AnalyzedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<bool>("FallbackUsed")
-                        .HasColumnType("bit");
+                b.Property<bool>("FallbackUsed")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FileName")
+                    .HasColumnType("text");
 
-                    b.Property<string>("GitHubUrl")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("GitHubUrl")
+                    .HasColumnType("text");
 
-                    b.Property<string>("ProgrammingLanguage")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ProgrammingLanguage")
+                    .HasColumnType("text");
 
-                    b.Property<string>("RawCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RawCode")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("SubmissionType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SubmissionType")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Summary")
+                    .HasColumnType("text");
 
-                    b.Property<int>("TotalBugsFound")
-                        .HasColumnType("int");
+                b.Property<int>("TotalBugsFound")
+                    .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasColumnType("character varying(450)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("BugReports", "BugDetection");
-                });
+                b.ToTable("BugReports", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.CodeAnalysisSession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("AiProvider")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("AiProvider")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("ArchitectureAssessment")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ArchitectureAssessment")
+                    .HasColumnType("text");
 
-                    b.Property<string>("CluesFound")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CluesFound")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int>("CriticalIssues")
-                        .HasColumnType("int");
+                b.Property<int>("CriticalIssues")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("DetectedArchitecture")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("DetectedArchitecture")
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)");
 
-                    b.Property<string>("DetectedFramework")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("DetectedFramework")
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)");
 
-                    b.Property<string>("DetectedLanguage")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("DetectedLanguage")
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<string>("DetectedPatterns")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("DetectedPatterns")
+                    .HasColumnType("text");
 
-                    b.Property<string>("DetectedPrinciples")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("DetectedPrinciples")
+                    .HasColumnType("text");
 
-                    b.Property<string>("ExecutiveSummary")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ExecutiveSummary")
+                    .HasColumnType("text");
 
-                    b.Property<bool>("FallbackUsed")
-                        .HasColumnType("bit");
+                b.Property<bool>("FallbackUsed")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("FileName")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("FileName")
+                    .HasMaxLength(500)
+                    .HasColumnType("character varying(500)");
 
-                    b.Property<string>("FinalAnalysis")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FinalAnalysis")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("FinalAnalyzedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("FinalAnalyzedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FollowUpQuestions")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FollowUpQuestions")
+                    .HasColumnType("text");
 
-                    b.Property<string>("GitHubUrl")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                b.Property<string>("GitHubUrl")
+                    .HasMaxLength(1000)
+                    .HasColumnType("character varying(1000)");
 
-                    b.Property<int>("HighIssues")
-                        .HasColumnType("int");
+                b.Property<int>("HighIssues")
+                    .HasColumnType("integer");
 
-                    b.Property<DateTime?>("InitialAnalyzedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("InitialAnalyzedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("InitialObservations")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("InitialObservations")
+                    .HasColumnType("text");
 
-                    b.Property<string>("InjectedServices")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("InjectedServices")
+                    .HasColumnType("text");
 
-                    b.Property<string>("LongTermRecommendations")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("LongTermRecommendations")
+                    .HasColumnType("text");
 
-                    b.Property<int>("LowIssues")
-                        .HasColumnType("int");
+                b.Property<int>("LowIssues")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("MediumIssues")
-                        .HasColumnType("int");
+                b.Property<int>("MediumIssues")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("OverallCodeQuality")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("OverallCodeQuality")
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("PatternCompliance")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PatternCompliance")
+                    .HasColumnType("text");
 
-                    b.Property<string>("QuickWins")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("QuickWins")
+                    .HasColumnType("text");
 
-                    b.Property<string>("RawCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RawCode")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("RefactoringPriorities")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RefactoringPriorities")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("SubmissionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("SubmissionType")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<int>("TotalIssuesFound")
-                        .HasColumnType("int");
+                b.Property<int>("TotalIssuesFound")
+                    .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("UserAnswers")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UserAnswers")
+                    .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasMaxLength(450)
+                    .HasColumnType("character varying(450)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("CreatedAt");
+                b.HasIndex("CreatedAt");
 
-                    b.HasIndex("Status");
+                b.HasIndex("Status");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("CodeAnalysisSessions", "BugDetection");
-                });
+                b.ToTable("CodeAnalysisSessions", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.CodeIssue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("ArchitectureLayerViolated")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("ArchitectureLayerViolated")
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)");
 
-                    b.Property<string>("CodeSnippet")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CodeSnippet")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Contradiction")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Contradiction")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("DeveloperIntent")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("DeveloperIntent")
+                    .HasColumnType("text");
 
-                    b.Property<int?>("EndLineNumber")
-                        .HasColumnType("int");
+                b.Property<int?>("EndLineNumber")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("Explanation")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Explanation")
+                    .HasColumnType("text");
 
-                    b.Property<string>("FixedCode")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FixedCode")
+                    .HasColumnType("text");
 
-                    b.Property<string>("FoundInPhase")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("FoundInPhase")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<bool>("IsConfirmed")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsConfirmed")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("IssueType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("IssueType")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<int?>("LineNumber")
-                        .HasColumnType("int");
+                b.Property<int?>("LineNumber")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                b.Property<int>("OrderIndex")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("PatternViolated")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                b.Property<string>("PatternViolated")
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)");
 
-                    b.Property<string>("PrincipleViolated")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("PrincipleViolated")
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<string>("RefactoringSteps")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("RefactoringSteps")
+                    .HasColumnType("text");
 
-                    b.Property<Guid>("SessionId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("SessionId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Severity")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("SuggestedFix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SuggestedFix")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("character varying(500)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("IssueType");
+                b.HasIndex("IssueType");
 
-                    b.HasIndex("SessionId");
+                b.HasIndex("SessionId");
 
-                    b.HasIndex("Severity");
+                b.HasIndex("Severity");
 
-                    b.ToTable("CodeIssues", "BugDetection");
-                });
+                b.ToTable("CodeIssues", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Outbox.OutboxMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Content")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Error")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Error")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("LastProcessedAtUtc")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("LastProcessedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("RetryCount")
-                        .HasColumnType("int");
+                b.Property<int>("RetryCount")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("OutboxMessages", "BugDetection");
-                });
+                b.ToTable("OutboxMessages", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Permissions.Permission", b =>
-                {
-                    b.Property<string>("PermissionId")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("PermissionId")
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("ImgClass")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ImgClass")
+                    .HasColumnType("text");
 
-                    b.Property<string>("InstitutionCode")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("InstitutionCode")
+                    .HasColumnType("text");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("boolean");
 
-                    b.Property<bool>("IsFinancialInstitution")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsFinancialInstitution")
+                    .HasColumnType("boolean");
 
-                    b.Property<bool>("IsMainTaxAgent")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsMainTaxAgent")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("MenuFileName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("MenuFileName")
+                    .HasColumnType("text");
 
-                    b.Property<string>("ParentPermissionCode")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ParentPermissionCode")
+                    .HasColumnType("text");
 
-                    b.Property<string>("PermissionCode")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PermissionCode")
+                    .HasColumnType("text");
 
-                    b.Property<string>("PermissionName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PermissionName")
+                    .HasColumnType("text");
 
-                    b.Property<int?>("PermissionOrder")
-                        .HasColumnType("int");
+                b.Property<int?>("PermissionOrder")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("PermissionUrl")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PermissionUrl")
+                    .HasColumnType("text");
 
-                    b.Property<string>("SectionImgClass")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SectionImgClass")
+                    .HasColumnType("text");
 
-                    b.Property<string>("SectionName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SectionName")
+                    .HasColumnType("text");
 
-                    b.HasKey("PermissionId");
+                b.HasKey("PermissionId");
 
-                    b.ToTable("Permissions", "BugDetection");
-                });
+                b.ToTable("Permissions", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.UserPermissions.UserPermission", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                b.Property<bool>("IsActive")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("boolean")
+                    .HasDefaultValue(true);
 
-                    b.Property<string>("PermissionId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("PermissionId")
+                    .IsRequired()
+                    .HasMaxLength(450)
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasMaxLength(450)
+                    .HasColumnType("character varying(450)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("PermissionId");
+                b.HasIndex("PermissionId");
 
-                    b.HasIndex("UserId", "PermissionId")
-                        .IsUnique();
+                b.HasIndex("UserId", "PermissionId")
+                    .IsUnique();
 
-                    b.ToTable("UserPermissions", "BugDetection");
-                });
+                b.ToTable("UserPermissions", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Users.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("Id")
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime?>("AppDisabledAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("AppDisabledAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("AppDisabledBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("AppDisabledBy")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("CreatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CreatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("DeletedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("DeletedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime?>("FirstLoginAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("FirstLoginAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FirstName")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<bool>("IsAppEnabled")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsAppEnabled")
+                    .HasColumnType("boolean");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("boolean");
 
-                    b.Property<bool>("IsFinancialInstitution")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsFinancialInstitution")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("KeycloakId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("KeycloakId")
+                    .IsRequired()
+                    .HasColumnType("character varying(450)");
 
-                    b.Property<DateTime?>("LastLoginAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("LastLoginAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("LastName")
+                    .HasColumnType("text");
 
-                    b.Property<string>("ProfilePicture")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ProfilePicture")
+                    .HasColumnType("text");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
+                b.Property<byte[]>("RowVersion")
+                    .IsConcurrencyToken()
+                    .IsRequired()
+                    .ValueGeneratedOnAddOrUpdate()
+                    .HasColumnType("bytea");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UpdatedBy")
+                    .HasColumnType("text");
 
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("UserName")
+                    .HasColumnType("text");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
+                b.HasIndex("Email")
+                    .IsUnique();
 
-                    b.HasIndex("KeycloakId")
-                        .IsUnique();
+                b.HasIndex("KeycloakId")
+                    .IsUnique();
 
-                    b.ToTable("Users", "BugDetection");
-                });
+                b.ToTable("Users", "BugDetection");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Audits.Audit", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("ActionByWho")
-                        .OnDelete(DeleteBehavior.SetNull);
+            {
+                b.HasOne("Domain.Application.Entities.Users.User", "User")
+                    .WithMany()
+                    .HasForeignKey("ActionByWho")
+                    .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.AnalysisConversation", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.BugDetection.CodeAnalysisSession", "Session")
-                        .WithMany("Conversations")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.BugDetection.CodeAnalysisSession", "Session")
+                    .WithMany("Conversations")
+                    .HasForeignKey("SessionId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Session");
-                });
+                b.Navigation("Session");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.BugItem", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.BugDetection.BugReport", "BugReport")
-                        .WithMany("BugItems")
-                        .HasForeignKey("BugReportId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.BugDetection.BugReport", "BugReport")
+                    .WithMany("BugItems")
+                    .HasForeignKey("BugReportId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("BugReport");
-                });
+                b.Navigation("BugReport");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.BugReport", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.Users.User", "User")
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.CodeAnalysisSession", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .HasPrincipalKey("KeycloakId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.Users.User", "User")
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .HasPrincipalKey("KeycloakId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.CodeIssue", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.BugDetection.CodeAnalysisSession", "Session")
-                        .WithMany("Issues")
-                        .HasForeignKey("SessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.BugDetection.CodeAnalysisSession", "Session")
+                    .WithMany("Issues")
+                    .HasForeignKey("SessionId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Session");
-                });
+                b.Navigation("Session");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.UserPermissions.UserPermission", b =>
-                {
-                    b.HasOne("Domain.Application.Entities.Permissions.Permission", "Permission")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+            {
+                b.HasOne("Domain.Application.Entities.Permissions.Permission", "Permission")
+                    .WithMany("UserPermissions")
+                    .HasForeignKey("PermissionId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Domain.Application.Entities.Users.User", "User")
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                b.HasOne("Domain.Application.Entities.Users.User", "User")
+                    .WithMany("UserPermissions")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Permission");
+                b.Navigation("Permission");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.BugReport", b =>
-                {
-                    b.Navigation("BugItems");
-                });
+            {
+                b.Navigation("BugItems");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.BugDetection.CodeAnalysisSession", b =>
-                {
-                    b.Navigation("Conversations");
+            {
+                b.Navigation("Conversations");
 
-                    b.Navigation("Issues");
-                });
+                b.Navigation("Issues");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Permissions.Permission", b =>
-                {
-                    b.Navigation("UserPermissions");
-                });
+            {
+                b.Navigation("UserPermissions");
+            });
 
             modelBuilder.Entity("Domain.Application.Entities.Users.User", b =>
-                {
-                    b.Navigation("UserPermissions");
-                });
+            {
+                b.Navigation("UserPermissions");
+            });
 #pragma warning restore 612, 618
         }
     }
