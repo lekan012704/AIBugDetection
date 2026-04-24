@@ -67,25 +67,17 @@ try
     DotNetEnv.Env.Load();
     var app = builder.Build();
 
-    try
+    if (args.Contains("--migrate"))
     {
         using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var dbContext = scope.ServiceProvider
-            .GetRequiredService<ApplicationDbContext>();
-
-        Log.Information("Applying database migrations...");
-
+        Log.Information("Running database migrations...");
         dbContext.Database.Migrate();
+        Log.Information("Database migrations completed.");
 
-        Log.Information("Database migrations applied successfully.");
+        return;
     }
-    catch (Exception ex)
-    {
-        Log.Fatal(ex, "Database migration failed");
-        throw; // 🔥 VERY IMPORTANT: DO NOT HIDE ERROR
-    }
-
     // ✅ Configure HTTP pipeline in correct order
 
     if (app.Environment.IsDevelopment() ||
@@ -173,7 +165,6 @@ try
     });
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
-    Log.Information("BUG DETECTION Api Starting..");
     await app.RunAsync();
     Log.Information("BUG DETECTION Api Started..");
 }
