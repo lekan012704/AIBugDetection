@@ -45,8 +45,8 @@ try
     builder.Services
         .AddApplication(builder.Configuration)
         .AddPresentation()
-        .AddInfrastructure(builder.Configuration); // ← AddHealthChecks is inside here
-        //.AddSharedKernel();
+        .AddInfrastructure(builder.Configuration); // ← AddHealthChecks is inside here  
+        //.AddSharedKernel();           
 
     builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
     builder.Configuration

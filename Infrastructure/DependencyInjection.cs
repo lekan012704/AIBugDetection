@@ -61,7 +61,7 @@ public static class DependencyInjection
             .AddCaching(configuration)
             .AddApiVersioning()
             .AddAuthenticationInternal(configuration)
-            .AddAuthorizationInternal();
+            .AddAuthorizationInternal();    
         //    .AddEmailingService(configuration);
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -391,34 +391,41 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddHealthChecks(
-    this IServiceCollection services,
-    IConfiguration configuration)
-{
-    var healthChecks = services
-        .AddHealthChecks()
-        .AddSqlServer(
-            connectionString: configuration.GetConnectionString("Database")
-                ?? throw new Exception("Database connection string cannot be null"),
-            healthQuery: "SELECT 1;",
-            name: "AppDatabase",
-            timeout: TimeSpan.FromSeconds(30),
-            failureStatus: HealthStatus.Degraded,
-            tags: ["db", "postgress",]);
-
-    // ✅ Only add Keycloak health check if URL is configured
-    var keycloakUrl = configuration["KeyCloak:BaseUrl"];
-    if (!string.IsNullOrWhiteSpace(keycloakUrl))
+     this IServiceCollection services,
+     IConfiguration configuration)
     {
-        healthChecks.AddUrlGroup(
-            uri: new Uri(keycloakUrl),
-            httpMethod: HttpMethod.Get,
-            name: "keycloak",
-            failureStatus: HealthStatus.Degraded,
-            tags: ["auth", "keycloak"]);
-    }
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-    return services;
-}
+        if (string.IsNullOrWhiteSpace(databaseUrl))
+            throw new Exception("DATABASE_URL is not set");
+
+        var connectionString = ConvertToNpgsqlConnectionString(databaseUrl);
+
+        var healthChecks = services
+            .AddHealthChecks()
+            .AddNpgSql(
+                connectionString: connectionString,
+                name: "AppDatabase",
+                timeout: TimeSpan.FromSeconds(30),
+                failureStatus: HealthStatus.Degraded,
+                tags: ["db", "postgres"]);
+
+        var keycloakUrl =
+            Environment.GetEnvironmentVariable("KEYCLOAK_BASEURL")
+            ?? configuration["KeyCloak:BaseUrl"];
+
+        if (!string.IsNullOrWhiteSpace(keycloakUrl))
+        {
+            healthChecks.AddUrlGroup(
+                uri: new Uri(keycloakUrl),
+                httpMethod: HttpMethod.Get,
+                name: "keycloak",
+                failureStatus: HealthStatus.Degraded,
+                tags: ["auth", "keycloak"]);
+        }
+
+        return services;
+    }
 
     private static IServiceCollection AddAuthenticationInternal(
      this IServiceCollection services,
