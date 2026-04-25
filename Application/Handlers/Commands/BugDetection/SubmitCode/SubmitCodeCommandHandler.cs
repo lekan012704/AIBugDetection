@@ -123,8 +123,7 @@ internal sealed class SubmitCodeCommandHandler(
                 CreatedBy = "System"
             });
 
-            await unitOfWork.PersistChangesAsync(
-                logAuditTrail: true,
+            await unitOfWork.SaveChangesAsync(
                 cancellationToken: cancellationToken);
 
             logger.LogInformation(

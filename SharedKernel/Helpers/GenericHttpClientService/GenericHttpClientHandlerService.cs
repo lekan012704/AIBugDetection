@@ -54,6 +54,13 @@ namespace SharedKernel.Helpers.GenericHttpClientService
                 HttpClient httpClient = CreateHttpClient(uri, authToken, headers);
 
                 var responseMessage = await ExecuteWithRetryAsync(() => httpClient.PostAsync(uri, content));
+                var rawBody = await responseMessage.Content.ReadAsStringAsync();
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    throw new Exception(
+                        $"OpenAI failed. Status: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}. Body: {rawBody}");
+                }
 
                 return await ProcessResponseAsync<TResponse>(responseMessage, uri, "POST");
             }

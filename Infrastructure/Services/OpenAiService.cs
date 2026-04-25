@@ -5,8 +5,11 @@ using ErrorOr;
 using Infrastructure.AI.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NHibernate.Cfg;
 using SharedKernel;
 using SharedKernel.Helpers.GenericHttpClientService;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,13 +18,13 @@ namespace Infrastructure.Services
     public sealed class OpenAiService : IOpenAiService
     {
         private readonly string _apiUrl;
-        private readonly AppSettings _appSettings;
+        private readonly Application.Helper.AppSettings _appSettings;
         private readonly ILogger<OpenAiService> _logger;
         private readonly IGenericHttpClientHandlerService _genericlient;
 
         public OpenAiService(
             ILogger<OpenAiService> logger,
-            IOptions<AppSettings> appSettings,
+            IOptions<Application.Helper.AppSettings> appSettings,
             IGenericHttpClientHandlerService genericlient)
         {
             _logger = logger;
@@ -131,109 +134,122 @@ namespace Infrastructure.Services
             }
         }
 
-        private async Task<ErrorOr<string>> CallOpenAiAsync(
-            string prompt,
-            CancellationToken cancellationToken)
+
+private async Task<ErrorOr<string>> CallOpenAiAsync(
+    string prompt,
+    CancellationToken cancellationToken)
+    {
+        try
         {
-            try
+            var apiKey = _appSettings.OpenAiApiKey;
+            if (string.IsNullOrWhiteSpace(apiKey))
+                return Errors.Infrastructure.DatabaseError(
+                    "OpenAI.Config",
+                    "OpenAI API key not configured.");
+
+            var request = new OpenAiRequest
             {
-                var apiKey = _appSettings.OpenAiApiKey;
-                if (string.IsNullOrWhiteSpace(apiKey))
-                    return Errors.Infrastructure.DatabaseError(
-                        "OpenAI.Config",
-                        "OpenAI API key not configured. " +
-                        "Add OpenAiApiKey to appsettings.");
-
-                // ✅ OpenAI requires system message for JSON mode
-                var request = new OpenAiRequest
+                Model = _appSettings.OpenAiModel,
+                MaxTokens = 2000,
+                Temperature = 0.1,
+                ResponseFormat = new OpenAiResponseFormat
                 {
-                    Model = _appSettings.OpenAiModel,
-                    MaxTokens = 8096,
-                    Temperature = 0.1,
-                    ResponseFormat = new OpenAiResponseFormat
-                    {
-                        Type = "json_object"
-                    },
-                    Messages = new List<OpenAiMessage>
-                    {
-                        new OpenAiMessage
-                        {
-                            Role = "system",
-                            Content = "You are a senior software architect. " +
-                                      "Always respond with valid JSON only. " +
-                                      "No markdown. No explanation. Just JSON."
-                        },
-                        new OpenAiMessage
-                        {
-                            Role = "user",
-                            Content = prompt
-                        }
-                    }
-                };
-
-                _logger.LogInformation(
-                    "Calling OpenAI API. Model: {Model}",
-                    _appSettings.OpenAiModel);
-
-                // ✅ OpenAI uses Bearer token — pass as authToken
-                // GenericHttpClientHandlerService sets Authorization: Bearer {apiKey}
-                var response = await _genericlient
-                    .PostAsync<OpenAiRequest, OpenAiResponse>(
-                        _apiUrl,
-                        request,
-                        authToken: apiKey);
-
-                if (response is null)
+                    Type = "json_object"
+                },
+                Messages = new List<OpenAiMessage>
+            {
+                new OpenAiMessage
                 {
-                    _logger.LogError(
-                        "OpenAI API returned null response");
-                    return Errors.Infrastructure.ExternalServiceFailure(
-                        "OpenAI",
-                        "Null response from OpenAI API. " +
-                        "Check API key and network.");
+                    Role = "system",
+                    Content = "You are a senior software architect. " +
+                              "Always respond with valid JSON only. " +
+                              "No markdown. No explanation. Just JSON."
+                },
+                new OpenAiMessage
+                {
+                    Role = "user",
+                    Content = prompt
                 }
-
-                if (response.Error is not null)
-                {
-                    _logger.LogError(
-                        "OpenAI API error. Type: {Type} " +
-                        "Code: {Code} Message: {Message}",
-                        response.Error.Type,
-                        response.Error.Code,
-                        response.Error.Message);
-                    return Errors.Infrastructure.ExternalServiceFailure(
-                        "OpenAI",
-                        $"OpenAI error: {response.Error.Type} — " +
-                        $"{response.Error.Message}");
-                }
-
-                if (!response.IsValid())
-                {
-                    _logger.LogError(
-                        "OpenAI returned empty or invalid response");
-                    return Errors.Infrastructure.ExternalServiceFailure(
-                        "OpenAI",
-                        "Empty response from OpenAI API");
-                }
-
-                var text = response.GetText()!;
-
-                _logger.LogInformation(
-                    "OpenAI API call successful. " +
-                    "TotalTokens: {Total}",
-                    response.Usage?.TotalTokens ?? 0);
-
-                return CleanJson(text);
             }
-            catch (Exception ex)
+            };
+
+            _logger.LogInformation(
+                "Calling OpenAI API. Model: {Model}",
+                _appSettings.OpenAiModel);
+
+            using var httpClient = new HttpClient();
+
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", apiKey);
+
+            var json = JsonSerializer.Serialize(
+                request,
+                new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null, // 🔥 CRITICAL FIX
+                    DefaultIgnoreCondition =
+                        System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                });
+
+            using var content =
+                new StringContent(json, Encoding.UTF8, "application/json");
+
+            var responseMessage = await httpClient.PostAsync(
+                _apiUrl,
+                content,
+                cancellationToken);
+
+            var rawBody = await responseMessage.Content
+                .ReadAsStringAsync(cancellationToken);
+
+            if (!responseMessage.IsSuccessStatusCode)
             {
-                _logger.LogError(ex, "OpenAI API call failed");
+                _logger.LogError(
+                    "OpenAI raw error: {Status} {Body}",
+                    responseMessage.StatusCode,
+                    rawBody);
+
                 return Errors.Infrastructure.ExternalServiceFailure(
-                    "OpenAI", ex.Message);
+                    "OpenAI",
+                    rawBody);
             }
-        }
 
-        private ErrorOr<T> ParseResponse<T>(string json)
+            var response = JsonSerializer.Deserialize<OpenAiResponse>(
+                rawBody,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (response is null || !response.IsValid())
+            {
+                _logger.LogError(
+                    "OpenAI returned invalid response: {Body}",
+                    rawBody);
+
+                return Errors.Infrastructure.ExternalServiceFailure(
+                    "OpenAI",
+                    "Invalid response from OpenAI");
+            }
+
+            var text = response.GetText()!;
+
+            _logger.LogInformation(
+                "OpenAI success. Tokens: {Total}",
+                response.Usage?.TotalTokens ?? 0);
+
+            return CleanJson(text);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "OpenAI API call failed");
+            return Errors.Infrastructure.ExternalServiceFailure(
+                "OpenAI",
+                ex.Message);
+        }
+    }
+
+    private ErrorOr<T> ParseResponse<T>(string json)
             where T : class, new()
         {
             try

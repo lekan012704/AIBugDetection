@@ -126,11 +126,34 @@ public static class DependencyInjection
                 connectionString);
         }
 
+        //var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+        //if (string.IsNullOrWhiteSpace(databaseUrl))
+        //{
+        //    throw new Exception("DATABASE_URL is not set");
+        //}
+
+        //services.AddDbContext<ApplicationDbContext>(options =>
+        //{
+        //    options.UseNpgsql(connectionString, npgsqlOptions =>
+        //    {
+        //        npgsqlOptions.EnableRetryOnFailure(3);
+        //        npgsqlOptions.CommandTimeout(30);
+        //    })
+        //    .ConfigureWarnings(warnings =>
+        //    {
+        //        warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning);
+        //    });
+        //});
         var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-        if (string.IsNullOrWhiteSpace(databaseUrl))
+        var connectionStrings = !string.IsNullOrWhiteSpace(databaseUrl)
+            ? ConvertToNpgsqlConnectionString(databaseUrl)
+            : configuration.GetConnectionString("Database");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new Exception("DATABASE_URL is not set");
+            throw new Exception("Database connection string is not configured");
         }
 
         services.AddDbContext<ApplicationDbContext>(options =>
@@ -139,10 +162,6 @@ public static class DependencyInjection
             {
                 npgsqlOptions.EnableRetryOnFailure(3);
                 npgsqlOptions.CommandTimeout(30);
-            })
-            .ConfigureWarnings(warnings =>
-            {
-                warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning);
             });
         });
         services.AddScoped<IUnitOfWork>(sp =>
@@ -429,6 +448,46 @@ public static class DependencyInjection
 
         return services;
     }
+    //private static IServiceCollection AddHealthChecks(
+    //this IServiceCollection services,
+    //IConfiguration configuration)
+    //{
+    //    var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+    //    var connectionString = !string.IsNullOrWhiteSpace(databaseUrl)
+    //        ? ConvertToNpgsqlConnectionString(databaseUrl)
+    //        : configuration.GetConnectionString("Database");
+
+    //    if (string.IsNullOrWhiteSpace(connectionString))
+    //    {
+    //        throw new Exception("Database connection string is not configured");
+    //    }
+
+    //    var healthChecks = services
+    //        .AddHealthChecks()
+    //        .AddNpgSql(
+    //            connectionString: connectionString,
+    //            name: "AppDatabase",
+    //            timeout: TimeSpan.FromSeconds(30),
+    //            failureStatus: HealthStatus.Degraded,
+    //            tags: ["db", "postgres"]);
+
+    //    var keycloakUrl =
+    //        Environment.GetEnvironmentVariable("KEYCLOAK_BASEURL")
+    //        ?? configuration["KeyCloak:BaseUrl"];
+
+    //    if (!string.IsNullOrWhiteSpace(keycloakUrl))
+    //    {
+    //        healthChecks.AddUrlGroup(
+    //            uri: new Uri(keycloakUrl),
+    //            httpMethod: HttpMethod.Get,
+    //            name: "keycloak",
+    //            failureStatus: HealthStatus.Degraded,
+    //            tags: ["auth", "keycloak"]);
+    //    }
+
+    //    return services;
+    //}
 
     private static IServiceCollection AddAuthenticationInternal(
      this IServiceCollection services,

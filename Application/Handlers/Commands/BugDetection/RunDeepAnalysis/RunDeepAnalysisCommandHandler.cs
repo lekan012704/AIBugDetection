@@ -75,12 +75,12 @@ internal sealed class RunDeepAnalysisCommandHandler(
             await sessionRepository.UpdateAsync(session, cancellationToken);
 
             logger.LogInformation(
-                "Starting deep analysis for session {SessionId}",
+                "Starting deep analysis for session {SessionId}",       
                 session.Id);
 
             // Step 6: Run deep AI analysis
             var deepResult = await aiService.RunDeepAnalysisAsync(
-                session.RawCode,
+                session.RawCode,        
                 session.InitialObservations ?? string.Empty,
                 answersJson,
                 session.FileName,
