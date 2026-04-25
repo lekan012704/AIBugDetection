@@ -35,7 +35,7 @@ try
             policy.WithOrigins(
                     "http://localhost:8080",
                     "http://localhost:5173",
-                    "https://your-frontend-domain.com")
+                    "https://ai-bug-detection-frontend.vercel.app")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
