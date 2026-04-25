@@ -28,7 +28,18 @@ try
     {
         options.SerializerOptions.PropertyNamingPolicy = null;
     });
-
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("FrontendCors", policy =>
+        {
+            policy.WithOrigins(
+                    "http://localhost:8080",
+                    "http://localhost:5173",
+                    "https://your-frontend-domain.com")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+    });
     // ✅ This tells ASP.NET Core to handle multipart form data
     builder.Services.Configure<FormOptions>(options =>
     {
@@ -141,7 +152,7 @@ try
 
     // ✅ Exception handler before auth
     app.UseExceptionHandler();
-
+    app.UseCors("FrontendCors");
     // ✅ Auth middleware — must be in this exact order
     app.UseAuthentication();
     app.UseAuthorization();
