@@ -163,25 +163,26 @@ try
     {
         options.UIPath = "/health-ui";
     });
-    app.MapPost("/admin/migrate-db", async (ApplicationDbContext dbContext) =>
-    {
-        try
-        {
-            await dbContext.Database.MigrateAsync();
+  //  use it other projects
+    //app.MapPost("/admin/migrate-db", async (ApplicationDbContext dbContext) =>
+    //{
+    //    try
+    //    {
+    //        await dbContext.Database.MigrateAsync();
 
-            return Results.Ok(new
-            {
-                message = "Database migrated successfully"
-            });
-        }
-        catch (Exception ex)
-        {
-            return Results.Problem(
-                title: "Migration failed",
-                detail: ex.ToString(),
-                statusCode: 500);
-        }
-    });
+    //        return Results.Ok(new
+    //        {
+    //            message = "Database migrated successfully"
+    //        });
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Results.Problem(
+    //            title: "Migration failed",
+    //            detail: ex.ToString(),
+    //            statusCode: 500);
+    //    }
+    //});
 
     //app.AddHangfireBackgroundJobs(builder.Configuration);
     await app.RunAsync();
