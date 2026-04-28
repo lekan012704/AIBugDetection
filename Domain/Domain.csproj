@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="External\Configurations\" />
+    <Folder Include="External\Entities\" />
   </ItemGroup>
 
 </Project>

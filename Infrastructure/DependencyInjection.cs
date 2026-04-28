@@ -11,7 +11,6 @@ using Application.Caching;
 using Application.Dapper;
 using Application.Helper;
 using Application.Models;
-using Application.Scheduler;
 using Asp.Versioning;
 using Dapper;
 using Domain.Application.Entities.Outbox;
@@ -73,10 +72,7 @@ public static class DependencyInjection
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
         services.AddScoped<IUserRespository, UserRepository>();
         services.AddSingleton<ICacheService, CacheService>();
-        //services.AddScoped<IContextSeed, ContextSeed>();
         services.AddScoped<IUserContext, UserContext>();
-        //services.AddScoped<IHandleException, HandleException>();
-        //services.AddScoped<IEmailAddressService, EmailAddressService>();
         services.AddScoped<IEntityManagerService, EntityManagerService>();
         services.AddScoped<IGenericHttpClientHandlerService, GenericHttpClientHandlerService>();
         services.AddScoped<IGitHubService, GitHubService>();
@@ -89,8 +85,6 @@ public static class DependencyInjection
         services.AddScoped<IBugReportRepository, BugReportRepository>();
         services.AddScoped<ICodeAnalysisSessionRepository, CodeAnalysisSessionRepository>();
         
-
-        // ✅ Removed — Keycloak issues tokens, we don't create our own
         // services.AddSingleton<IPasswordHasher, PasswordHasher>();
         // services.AddScoped<IJwtTokenProvider, JwtTokenProvider>();
 

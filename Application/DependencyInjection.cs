@@ -13,11 +13,10 @@ namespace Application
         {
             services.AddMediatR(config =>
             {
-                config.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
+                config.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);  
 
                 config.AddOpenBehavior(typeof(RequestLoggingPipelineBehavior<,>));
                 config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
-                config.AddOpenBehavior(typeof(TransactionBehavior<,>));
             });
 
             services.AddExceptionHandler<GlobalExceptionHandler>();

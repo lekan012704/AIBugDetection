@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Folder Include="Abstractions\ExternalServices\" />
+    <Folder Include="Email\" />
   </ItemGroup>
 	
  <ItemGroup>
